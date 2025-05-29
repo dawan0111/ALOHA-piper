@@ -15,6 +15,9 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(OpenCV REQUIRED)
+
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -22,6 +25,8 @@ find_package(rosbag2_cpp REQUIRED)
 include_directories(
   ${PROJECT_SOURCE_DIR}/include
 )
+
+# ========== Record Component ==========
 
 set(RECORD_SERVER_NAME act_episode_record_server)
 
@@ -43,12 +48,51 @@ rclcpp_components_register_node(${RECORD_SERVER_NAME}_component
 
 ament_export_targets(export_${RECORD_SERVER_NAME}_component)
 
-install(TARGETS ${RECORD_SERVER_NAME}_component
-        EXPORT export_${RECORD_SERVER_NAME}_component
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
+# ========== Replay Component ==========
+
+set(REPLAY_SERVER_NAME act_episode_replay_server)
+
+add_library(${REPLAY_SERVER_NAME}_component SHARED
+  src/${REPLAY_SERVER_NAME}.cpp
 )
+ament_target_dependencies(${REPLAY_SERVER_NAME}_component
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  cv_bridge
+  OpenCV
+)
+rclcpp_components_register_node(${REPLAY_SERVER_NAME}_component
+  PLUGIN "ACT::EpisodeReplayServer"
+  EXECUTABLE ${REPLAY_SERVER_NAME}
+)
+ament_export_targets(export_${REPLAY_SERVER_NAME}_component)
+
+# ========== Install ==========
+install(TARGETS
+  ${RECORD_SERVER_NAME}_component
+  EXPORT export_${RECORD_SERVER_NAME}_component
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+install(TARGETS
+  ${REPLAY_SERVER_NAME}_component
+  EXPORT export_${REPLAY_SERVER_NAME}_component
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+# install(TARGETS
+#   ${RECORD_SERVER_NAME}_component
+#   ${REPLAY_SERVER_NAME}_component
+#   EXPORT export_${RECORD_SERVER_NAME}_component
+#   EXPORT export_${REPLAY_SERVER_NAME}_component
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+#   RUNTIME DESTINATION bin
+# )
 
 install(DIRECTORY
   launch

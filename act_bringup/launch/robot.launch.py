@@ -71,6 +71,36 @@ def generate_launch_description() -> LaunchDescription:
                     remappings=camera.remappings,
                     parameters=[camera.param_path]
                 ) for camera in CAMERAS
+            ] + [
+                ComposableNode(
+                    package='act_episode_server',
+                    plugin='ACT::EpisodeRecordServer',
+                    name='episode_record_server',
+                    parameters=[{
+                        'record_path': 'episode_data',
+                        'image_topic_names': [
+                            '/camera1/image_compressed',
+                            '/camera2/image_compressed',
+                            '/camera3/image_compressed',
+                            '/camera4/image_compressed',
+                        ]
+                    }],
+                    extra_arguments=[{'use_intra_process_comms': True}],
+                ),
+                ComposableNode(
+                    package='act_episode_server',
+                    plugin='ACT::EpisodeReplayServer',
+                    name='episode_replay_server',
+                    parameters=[{
+                        'image_topic_names': [
+                            '/record/camera1/image_compressed',
+                            '/record/camera2/image_compressed',
+                            '/record/camera3/image_compressed',
+                            '/record/camera4/image_compressed',
+                        ]
+                    }],
+                    extra_arguments=[{'use_intra_process_comms': True}],
+                )
             ],
             output='screen',
     )

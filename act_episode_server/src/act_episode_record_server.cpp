@@ -44,7 +44,7 @@ void EpisodeRecordServer::configure_interface() {
         topic_name, rclcpp::SensorDataQoS(),
         [this, topic_name](const Image::SharedPtr msg) {
           if (is_recoding_) {
-            this->write_to_bag(topic_name, *msg, msg->header.stamp);
+            this->write_to_bag("record" + topic_name, *msg, msg->header.stamp);
           }
         },
         options);
@@ -80,7 +80,7 @@ void EpisodeRecordServer::record_start() {
 
   for (const auto& topic_name : image_topic_names_) {
     recorder_->create_topic({
-        topic_name,
+        "record" + topic_name,
         "sensor_msgs/msg/CompressedImage",
         rmw_get_serialization_format(),
         "",
