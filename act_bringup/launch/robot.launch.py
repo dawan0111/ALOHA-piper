@@ -26,6 +26,7 @@ from launch.launch_description import LaunchDescription
 from camera_config import CameraConfig, USB_CAM_DIR  # noqa: E402
 
 from launch import LaunchDescription  # noqa: E402
+from launch_ros.actions import Node
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
@@ -75,5 +76,10 @@ def generate_launch_description() -> LaunchDescription:
     )
 
     return LaunchDescription([
-        container
+        # container,
+        Node(
+            package='act_episode_server',
+            executable='act_episode_record_server',
+            # ..
+        )
     ])
