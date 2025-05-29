@@ -78,7 +78,7 @@ def generate_launch_description() -> LaunchDescription:
                     name='episode_record_server',
                     parameters=[{
                         'record_path': 'episode_data',
-                        'image_topic_names': [
+                        'topic_names': [
                             '/camera1/image_compressed',
                             '/camera2/image_compressed',
                             '/camera3/image_compressed',
