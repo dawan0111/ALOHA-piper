@@ -61,7 +61,7 @@ def generate_launch_description() -> LaunchDescription:
             name='my_container',
             namespace='',
             package='rclcpp_components',
-            executable='component_container',
+            executable='component_container_mt',
             composable_node_descriptions=[
                 ComposableNode(
                     package='usb_cam',
@@ -75,11 +75,7 @@ def generate_launch_description() -> LaunchDescription:
             output='screen',
     )
 
+
     return LaunchDescription([
-        # container,
-        Node(
-            package='act_episode_server',
-            executable='act_episode_record_server',
-            # ..
-        )
+        container,
     ])

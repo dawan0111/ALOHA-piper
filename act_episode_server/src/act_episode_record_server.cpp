@@ -13,14 +13,11 @@ EpisodeRecordServer::EpisodeRecordServer(const rclcpp::NodeOptions& options)
   load_parameter();
   configure_interface();
 
-  RCLCPP_INFO(this->get_logger(), "EpisodeRecordServer initialized.");
+  RCLCPP_INFO(get_logger(), "EpisodeRecordServer initialized.");
 }
 
 void EpisodeRecordServer::load_parameter() {
   std::vector<std::string> topic_names;
-
-  topic_names.push_back("/camera1/image_compressed");
-  topic_names.push_back("/camera2/image_compressed");
 
   this->declare_parameter("image_topic_names", topic_names);
   this->declare_parameter("record_path", std::string("episode_bag"));
@@ -29,17 +26,29 @@ void EpisodeRecordServer::load_parameter() {
   this->get_parameter("record_path", record_path);
 
   RCLCPP_INFO(get_logger(), "Record path: %s", record_path.c_str());
+  RCLCPP_INFO(get_logger(), "Recording image topics:");
+  for (const auto& topic : image_topic_names_) {
+    RCLCPP_INFO(get_logger(), "  - %s", topic.c_str());
+  }
 }
 
 void EpisodeRecordServer::configure_interface() {
   for (const auto& topic_name : image_topic_names_) {
+    auto cb_group = this->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
+
+    rclcpp::SubscriptionOptions options;
+    options.callback_group = cb_group;
+
     auto sub = this->create_subscription<Image>(
         topic_name, rclcpp::SensorDataQoS(),
         [this, topic_name](const Image::SharedPtr msg) {
-          if (is_recoding_ && recorder_) {
-            recorder_->write(*msg, topic_name, msg->header.stamp);
+          if (is_recoding_) {
+            this->write_to_bag(topic_name, *msg, msg->header.stamp);
           }
-        });
+        },
+        options);
+
     image_subs_.push_back(sub);
   }
 
@@ -66,14 +75,16 @@ void EpisodeRecordServer::record_start() {
   storage_options.uri = full_path;
   storage_options.storage_id = "sqlite3";
 
-  //   rosbag2_cpp::ConverterOptions converter_options{"cdr", "cdr"};
-
   recorder_ = std::make_unique<rosbag2_cpp::Writer>();
   recorder_->open(storage_options);
 
   for (const auto& topic_name : image_topic_names_) {
-    recorder_->create_topic(
-        {topic_name, "sensor_msgs/msg/CompressedImage", "cdr", ""});
+    recorder_->create_topic({
+        topic_name,
+        "sensor_msgs/msg/CompressedImage",
+        rmw_get_serialization_format(),
+        "",
+    });
   }
 
   is_recoding_ = true;
