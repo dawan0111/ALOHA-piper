@@ -1,48 +1,36 @@
 from launch import LaunchDescription
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
-from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-
-from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
+import yaml
 import os
 
 def generate_launch_description():
-    with_rviz_arg = DeclareLaunchArgument(
-        'with_rviz',
-        default_value='false',
-        description='Whether to launch RViz'
-    )
-
     bag_path_arg = DeclareLaunchArgument(
         'bag_path',
-        description='Path to the rosbag2 folder to replay'
+        description='Name of the rosbag folder to replay (relative to record_path)'
     )
 
-    with_rviz = LaunchConfiguration('with_rviz')
+    recoding_config_path = os.path.join(
+        get_package_share_directory('act_bringup'),
+        'config',
+        'episode_record.yaml'
+    )
+    with open(recoding_config_path, 'r') as f:
+        config = yaml.safe_load(f)
+
+    record_path = config.get('record_path', '/tmp/record')
     bag_path = LaunchConfiguration('bag_path')
-
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', os.path.join(
-            get_package_share_directory('act_bringup'), 'rviz', 'rviz.rviz')],
-        condition=IfCondition(with_rviz),
-        output='screen'
-    )
+    full_bag_path = PathJoinSubstitution([record_path, bag_path])
 
     bag_play_cmd = ExecuteProcess(
-        cmd=[
-            'ros2', 'bag', 'play', bag_path,
-        ],
+        cmd=['ros2', 'bag', 'play', full_bag_path],
         output='screen'
     )
 
     return LaunchDescription([
-        with_rviz_arg,
         bag_path_arg,
-        rviz_node,
         bag_play_cmd
     ])

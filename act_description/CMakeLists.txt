@@ -12,7 +12,7 @@ find_package(urdf REQUIRED)
 ################################################################################
 # Install
 ################################################################################
-install(DIRECTORY meshes rviz urdf launch
+install(DIRECTORY rviz launch
   DESTINATION share/${PROJECT_NAME}
 )
 

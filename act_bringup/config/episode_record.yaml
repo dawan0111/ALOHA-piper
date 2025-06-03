@@ -1,0 +1,11 @@
+record_path: /tmp/record
+topic_names:
+ - /camera1/image_compressed
+ - /camera2/image_compressed
+ - /camera3/image_compressed
+ - /camera4/image_compressed
+ - /left_arm/joint_ctrl
+ - /left_arm/joint_states
+ - /right_arm/joint_ctrl
+ - /right_arm/joint_states
+ - /tf

@@ -52,8 +52,7 @@ void EpisodeRecordServer::configure_interface() {
          type_name](std::shared_ptr<rclcpp::SerializedMessage> msg) {
           if (is_recoding_ && recorder_) {
             std::lock_guard<std::mutex> lock(write_mutex_);
-            recorder_->write(msg, "record" + topic_name, type_name,
-                             this->now());
+            recorder_->write(msg, topic_name, type_name, this->now());
           }
         });
 
@@ -80,7 +79,7 @@ void EpisodeRecordServer::configure_interface() {
 
 void EpisodeRecordServer::record_start() {
   std::string time_tag = std::to_string(std::time(nullptr));
-  std::string full_path = record_path + "_" + time_tag;
+  std::string full_path = record_path + "/episode_" + time_tag;
 
   rosbag2_storage::StorageOptions storage_options;
   storage_options.uri = full_path;
@@ -101,7 +100,7 @@ void EpisodeRecordServer::record_start() {
     }
 
     recorder_->create_topic({
-        "record" + topic_name,
+        topic_name,
         it->second[0],  // 타입
         rmw_get_serialization_format(),
         ""  // default QoS profile
