@@ -20,6 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'act_data_collection = '
+            'act_example.act_data_collection.'
+            'act_data_collection:main',
         ],
     },
 )
