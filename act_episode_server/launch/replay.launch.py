@@ -4,6 +4,8 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
 import yaml
 import os
 
@@ -26,11 +28,36 @@ def generate_launch_description():
     full_bag_path = PathJoinSubstitution([record_path, bag_path])
 
     bag_play_cmd = ExecuteProcess(
-        cmd=['ros2', 'bag', 'play', full_bag_path],
+        cmd=['ros2', 'bag', 'play', full_bag_path, "--loop"],
         output='screen'
+    )
+
+    container = ComposableNodeContainer(
+            name='my_container',
+            namespace='',
+            package='rclcpp_components',
+            executable='component_container_mt',
+            composable_node_descriptions=[
+                ComposableNode(
+                    package='act_episode_server',
+                    plugin='ACT::EpisodeReplayServer',
+                    name='episode_replay_server',
+                    parameters=[{
+                        'image_topic_names': [
+                            '/camera1/image_compressed',
+                            '/camera2/image_compressed',
+                            '/camera3/image_compressed',
+                            '/camera4/image_compressed',
+                        ]
+                    }],
+                    extra_arguments=[{'use_intra_process_comms': True}],
+                )
+            ],
+            output='screen',
     )
 
     return LaunchDescription([
         bag_path_arg,
-        bag_play_cmd
+        bag_play_cmd,
+        container
     ])

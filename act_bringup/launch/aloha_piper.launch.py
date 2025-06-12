@@ -168,20 +168,6 @@ def generate_launch_description() -> LaunchDescription:
                         'topic_names': image_topics
                     }],
                     extra_arguments=[{'use_intra_process_comms': True}],
-                ),
-                ComposableNode(
-                    package='act_episode_server',
-                    plugin='ACT::EpisodeReplayServer',
-                    name='episode_replay_server',
-                    parameters=[{
-                        'image_topic_names': [
-                            '/camera1/image_compressed',
-                            '/camera2/image_compressed',
-                            '/camera3/image_compressed',
-                            '/camera4/image_compressed',
-                        ]
-                    }],
-                    extra_arguments=[{'use_intra_process_comms': True}],
                 )
             ],
             output='screen',
@@ -191,7 +177,7 @@ def generate_launch_description() -> LaunchDescription:
         left_can_port_arg,
         right_can_port_arg,
         auto_enable_arg,
-        display_xacro_launch,
+        # display_xacro_launch,
         gripper_exist_arg,
         gripper_val_mutiple_arg,
         left_piper_ctrl_node,
