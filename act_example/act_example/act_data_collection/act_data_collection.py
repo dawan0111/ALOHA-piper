@@ -9,7 +9,7 @@ class DataCollector(Node):
         
         # Declare parameter for duration
         self.declare_parameter('record_duration', 10.0)
-        self.record_client = self.create_client(Empty, 'record')
+        self.record_client = self.create_client(Empty, 'start_record')
 
         while not self.record_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Waiting for record service...')

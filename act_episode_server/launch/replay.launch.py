@@ -6,10 +6,19 @@ from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
+
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import IncludeLaunchDescription 
+
 import yaml
 import os
 
 def generate_launch_description():
+    act_description_path = os.path.join(
+        get_package_share_directory('act_description'),
+        'launch',
+        'display.piper.launch.py',
+    )
     bag_path_arg = DeclareLaunchArgument(
         'bag_path',
         description='Name of the rosbag folder to replay (relative to record_path)'
@@ -28,8 +37,12 @@ def generate_launch_description():
     full_bag_path = PathJoinSubstitution([record_path, bag_path])
 
     bag_play_cmd = ExecuteProcess(
-        cmd=['ros2', 'bag', 'play', full_bag_path, "--loop"],
+        cmd=['ros2', 'bag', 'play', full_bag_path],
         output='screen'
+    )
+
+    act_description_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(act_description_path)
     )
 
     container = ComposableNodeContainer(
@@ -57,6 +70,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        act_description_launch,
         bag_path_arg,
         bag_play_cmd,
         container

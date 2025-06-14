@@ -1,4 +1,4 @@
-record_path: /tmp/record
+record_path: /home/airo/record
 topic_names:
  - /camera1/image_compressed
  - /camera2/image_compressed
