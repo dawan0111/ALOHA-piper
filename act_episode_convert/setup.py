@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'episode_convert_node = '
+            'act_episode_convert.episode_convert_node:main.',
         ],
     },
 )

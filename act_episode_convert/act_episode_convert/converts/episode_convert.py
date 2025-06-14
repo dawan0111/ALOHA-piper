@@ -3,7 +3,7 @@ from rosbag2_py import SequentialReader, StorageOptions, ConverterOptions
 from rclpy.serialization import deserialize_message
 from rosidl_runtime_py.utilities import get_message
 from collections import defaultdict
-from pipelines import resample_pipeline, decompress_compressed_images_pipeline, save_to_hdf5_pipeline
+from act_episode_convert.pipelines import resample_pipeline, decompress_compressed_images_pipeline, save_to_hdf5_pipeline
 
 class Compose:
     def __init__(self, transforms):
