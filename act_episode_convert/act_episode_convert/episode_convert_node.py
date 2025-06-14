@@ -1,3 +1,4 @@
+import os
 import rclpy
 import yaml
 from pathlib import Path
@@ -26,10 +27,16 @@ def list_episode_dirs(bag_root: Path) -> List[Path]:
 
 def run_multithread_convert(episodes: List[Path], thread_count: int):
     def worker(ep_path):
+        
         compose = Compose([
             resample_pipeline(0.02, 100),
             decompress_compressed_images_pipeline(),
-            save_to_hdf5_pipeline(f"/home/airo/convert/{ep_path.name}.hdf5")
+            save_to_hdf5_pipeline(os.path.join(
+                os.path.expanduser("~"),
+                "aloha_dataset",
+                "converted",
+                f"{ep_path.name}.hdf5"
+            ))
         ])
         convert = EpisodeConvert(compose)
         print(f"[START] {ep_path.name}")
@@ -61,8 +68,8 @@ def main(args=None):
         print("[WARN] No episodes found.")
         return
 
-    choice = input("\nEnter episode index to convert (or 'all'): ").strip()
-    if choice == 'all':
+    choice = input("\nEnter episode index to convert (or ''): ").strip()
+    if choice == '':
         selected = episodes
     else:
         try:
@@ -72,11 +79,12 @@ def main(args=None):
             print("[ERROR] Invalid input.")
             return
 
-    try:
-        thread_count = int(input("Enter number of threads: ").strip())
-    except ValueError:
-        print("[ERROR] Invalid thread count.")
-        return
+    thread_count = 1
+    # try:
+    #     thread_count = int(input("Enter number of threads: ").strip())
+    # except ValueError:
+    #     print("[ERROR] Invalid thread count.")
+    #     return
 
     print(f"\n[INFO] Running conversion on {len(selected)} episode(s) using {thread_count} threads...\n")
     run_multithread_convert(selected, thread_count)

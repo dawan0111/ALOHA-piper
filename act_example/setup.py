@@ -23,6 +23,10 @@ setup(
             'act_data_collection = '
             'act_example.act_data_collection.'
             'act_data_collection:main',
+
+            'act_hdf5_viewer = '
+            'act_example.act_hdf5_viewer.'
+            'act_hdf5_viewer:main',
         ],
     },
 )

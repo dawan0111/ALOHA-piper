@@ -1,4 +1,5 @@
-record_path: /home/airo/record
+record_path: /home/airo/aloha_dataset/raw_data
+converted_path: /home/airo/aloha_dataset/converted
 topic_names:
  - /camera1/image_compressed
  - /camera2/image_compressed
