@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 import h5py
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -35,62 +36,107 @@ def load_data(hdf5_path):
 
     return images, joint_pos, joint_cmd
 
+def show_images_cv2(image_dict, timestep, target_height=256):
+    keys = list(image_dict.keys())[:4]
+    imgs = [image_dict[k][timestep] for k in keys]
+
+    h0, w0 = imgs[0].shape[:2]
+    scale = target_height / h0
+    target_width = int(w0 * scale)
+    target_size = (target_width, target_height)
+
+    rendered_imgs = []
+    for i, img in enumerate(imgs):
+        img_bgr = cv2.resize(cv2.cvtColor(img, cv2.COLOR_RGB2BGR), target_size)
+        key_name = keys[i]
+
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        scale_txt = 0.5
+        thickness = 1
+        color = (255, 255, 255)
+        shadow = (0, 0, 0)
+
+        text_size, _ = cv2.getTextSize(key_name, font, scale_txt, thickness)
+        text_x = (img_bgr.shape[1] - text_size[0]) // 2
+        text_y = img_bgr.shape[0] - 10
+
+        cv2.putText(img_bgr, key_name, (text_x+1, text_y+1), font, scale_txt, shadow, thickness+1, cv2.LINE_AA)
+        cv2.putText(img_bgr, key_name, (text_x, text_y), font, scale_txt, color, thickness, cv2.LINE_AA)
+
+        rendered_imgs.append(img_bgr)
+
+    top = np.hstack(rendered_imgs[:2])
+    bottom = np.hstack(rendered_imgs[2:]) if len(rendered_imgs) > 2 else np.zeros_like(top)
+    grid = np.vstack([top, bottom])
+
+    cv2.imshow("Camera Views", grid)
+    cv2.waitKey(1)
+
+
 
 def play_episode(images, joint_pos, joint_cmd=None, fps=30.0):
     keys = list(images.keys())
     n_frames = min([images[k].shape[0] for k in keys] + [joint_pos.shape[0]])
     if joint_cmd is not None:
         n_frames = min(n_frames, joint_cmd.shape[0])
-    
+
     interval = 1.0 / fps
+    t_vals = np.arange(n_frames)
     num_joints = joint_pos.shape[1]
+    assert num_joints == 14, f"Expected 14 joints, got {num_joints}"
 
     fig = plt.figure(figsize=(12, 8))
-    axs_img = [fig.add_subplot(2, 3, i+1) for i in range(4)]
-    ax_joint = fig.add_subplot(2, 3, 5)
-    lines_pos, lines_cmd = [], []
+    gs = fig.add_gridspec(2, 1, height_ratios=[1, 1])
+    ax_joint_left = fig.add_subplot(gs[0])
+    ax_joint_right = fig.add_subplot(gs[1])
 
-    t_vals = np.arange(n_frames)
+    lines_left_pos, lines_left_cmd = [], []
+    lines_right_pos, lines_right_cmd = [], []
 
-    for j in range(num_joints):
-        (l_pos,) = ax_joint.plot([], [], label=f'j{j}_pos', linestyle='-')
-        lines_pos.append(l_pos)
+    for j in range(7):
+        (lp,) = ax_joint_left.plot([], [], label=f'L_j{j}', linestyle='-')
+        lines_left_pos.append(lp)
         if joint_cmd is not None:
-            (l_cmd,) = ax_joint.plot([], [], label=f'j{j}_cmd', linestyle='--')
-            lines_cmd.append(l_cmd)
+            (lc,) = ax_joint_left.plot([], [], label=f'L_j{j}_cmd', linestyle='--')
+            lines_left_cmd.append(lc)
 
-    ax_joint.set_xlim(0, n_frames)
-    all_vals = [joint_pos]
-    if joint_cmd is not None:
-        all_vals.append(joint_cmd)
-    vmin = min([a.min() for a in all_vals])
-    vmax = max([a.max() for a in all_vals])
-    ax_joint.set_ylim(vmin - 0.1, vmax + 0.1)
+        (rp,) = ax_joint_right.plot([], [], label=f'R_j{j}', linestyle='-')
+        lines_right_pos.append(rp)
+        if joint_cmd is not None:
+            (rc,) = ax_joint_right.plot([], [], label=f'R_j{j}_cmd', linestyle='--')
+            lines_right_cmd.append(rc)
 
-    ax_joint.set_title("Joint Positions vs Commands")
-    ax_joint.set_xlabel("Timestep")
-    ax_joint.set_ylabel("Value")
-    ax_joint.grid()
-    ax_joint.legend(loc='upper right')
+    def setup_ax(ax, title, *data):
+        ax.set_xlim(0, n_frames)
+        vmin = min([d[:, :7].min() for d in data])
+        vmax = max([d[:, :7].max() for d in data])
+        ax.set_ylim(vmin - 0.1, vmax + 0.1)
+        ax.set_title(title)
+        ax.set_xlabel("Timestep")
+        ax.set_ylabel("Value")
+        ax.grid()
+        ax.legend(loc='upper right')
+
+    setup_ax(ax_joint_left, "Left Arm Joints", joint_pos, joint_cmd if joint_cmd is not None else joint_pos)
+    setup_ax(ax_joint_right, "Right Arm Joints", joint_pos[:, 7:], joint_cmd[:, 7:] if joint_cmd is not None else joint_pos[:, 7:])
 
     for t in range(n_frames):
-        for i in range(4):
-            axs_img[i].clear()
-            if i < len(keys):
-                axs_img[i].imshow(images[keys[i]][t])
-                axs_img[i].set_title(keys[i])
-            axs_img[i].axis('off')
+        show_images_cv2(images, t)
 
-        for j in range(num_joints):
-            lines_pos[j].set_data(t_vals[:t+1], joint_pos[:t+1, j])
+        for j in range(7):
+            lines_left_pos[j].set_data(t_vals[:t+1], joint_pos[:t+1, j])
+            lines_right_pos[j].set_data(t_vals[:t+1], joint_pos[:t+1, j+7])
             if joint_cmd is not None:
-                lines_cmd[j].set_data(t_vals[:t+1], joint_cmd[:t+1, j])
+                lines_left_cmd[j].set_data(t_vals[:t+1], joint_cmd[:t+1, j])
+                lines_right_cmd[j].set_data(t_vals[:t+1], joint_cmd[:t+1, j+7])
 
-        ax_joint.relim()
-        ax_joint.autoscale_view()
-        plt.suptitle(f"Timestep {t}", fontsize=14)
+        ax_joint_left.relim(); ax_joint_left.autoscale_view()
+        ax_joint_right.relim(); ax_joint_right.autoscale_view()
+
+        plt.suptitle(f"Timestep {t}", fontsize=16)
         plt.pause(interval)
 
+    cv2.destroyAllWindows()
     plt.close()
 
 def main(args=None):

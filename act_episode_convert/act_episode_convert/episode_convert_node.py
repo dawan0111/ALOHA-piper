@@ -29,7 +29,7 @@ def run_multithread_convert(episodes: List[Path], thread_count: int):
     def worker(ep_path):
         
         compose = Compose([
-            resample_pipeline(0.02, 100),
+            resample_pipeline(0.02, 500),
             decompress_compressed_images_pipeline(),
             save_to_hdf5_pipeline(os.path.join(
                 os.path.expanduser("~"),
