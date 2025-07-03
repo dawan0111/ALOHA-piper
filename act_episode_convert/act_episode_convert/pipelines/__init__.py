@@ -1,3 +1,4 @@
 from .decompress_image import decompress_compressed_images_pipeline
 from .resample import resample_pipeline
 from .save_aloha_hdf5 import save_to_hdf5_pipeline
+from .normalize_gripper import normalize_gripper_pipeline

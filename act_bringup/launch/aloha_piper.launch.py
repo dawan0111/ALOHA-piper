@@ -177,7 +177,7 @@ def generate_launch_description() -> LaunchDescription:
         left_can_port_arg,
         right_can_port_arg,
         auto_enable_arg,
-        # display_xacro_launch,
+        display_xacro_launch,
         gripper_exist_arg,
         gripper_val_mutiple_arg,
         left_piper_ctrl_node,

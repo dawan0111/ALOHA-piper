@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
 from tqdm import tqdm
 
-from act_episode_convert.pipelines import resample_pipeline, decompress_compressed_images_pipeline, save_to_hdf5_pipeline
+from act_episode_convert.pipelines import resample_pipeline, decompress_compressed_images_pipeline, save_to_hdf5_pipeline, normalize_gripper_pipeline
 from act_episode_convert.converts import EpisodeConvert, Compose  # convert_module.py 에 정의된 클래스들
 
 
@@ -30,6 +30,7 @@ def run_multithread_convert(episodes: List[Path], thread_count: int):
         
         compose = Compose([
             resample_pipeline(0.02, 500),
+            normalize_gripper_pipeline(),
             decompress_compressed_images_pipeline(),
             save_to_hdf5_pipeline(os.path.join(
                 os.path.expanduser("~"),
@@ -80,11 +81,11 @@ def main(args=None):
             return
 
     thread_count = 1
-    # try:
-    #     thread_count = int(input("Enter number of threads: ").strip())
-    # except ValueError:
-    #     print("[ERROR] Invalid thread count.")
-    #     return
+    try:
+        thread_count = int(input("Enter number of threads: ").strip())
+    except ValueError:
+        print("[ERROR] Invalid thread count.")
+        return
 
     print(f"\n[INFO] Running conversion on {len(selected)} episode(s) using {thread_count} threads...\n")
     run_multithread_convert(selected, thread_count)

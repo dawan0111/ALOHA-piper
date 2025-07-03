@@ -3,7 +3,7 @@ from rosbag2_py import SequentialReader, StorageOptions, ConverterOptions
 from rclpy.serialization import deserialize_message
 from rosidl_runtime_py.utilities import get_message
 from collections import defaultdict
-from act_episode_convert.pipelines import resample_pipeline, decompress_compressed_images_pipeline, save_to_hdf5_pipeline
+from act_episode_convert.pipelines import resample_pipeline, decompress_compressed_images_pipeline, save_to_hdf5_pipeline, normalize_gripper_pipeline
 
 class Compose:
     def __init__(self, transforms):
@@ -69,11 +69,12 @@ class EpisodeConvert:
     
 if __name__ == "__main__":
     compose = Compose([
-        resample_pipeline(0.02, 100),
+        resample_pipeline(0.02, 500),
+        normalize_gripper_pipeline(),
         decompress_compressed_images_pipeline(),
         save_to_hdf5_pipeline("/home/airo/tmp.hdf5")
     ])
     convert = EpisodeConvert(compose)
-    data = convert.run("/home/airo/ros2_ws/episode_data")
+    data = convert.run("/home/airo/aloha_dataset/raw_data/episode_1751551427")
     data_keys = list(data.keys())
     print("data:", len(data[data_keys[0]]))
