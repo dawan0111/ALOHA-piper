@@ -1,6 +1,7 @@
 import os
 import rclpy
 import yaml
+import gc
 from pathlib import Path
 from ament_index_python.packages import get_package_share_directory
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -43,7 +44,11 @@ def run_multithread_convert(episodes: List[Path], thread_count: int):
         print(f"[START] {ep_path.name}")
         result = convert.run(str(ep_path))
         print(f"[DONE ] {ep_path.name}")
-        return result
+
+        del compose, convert, result
+
+        gc.collect()  # Force garbage collection to free memory
+        return True
 
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         futures = {executor.submit(worker, ep): ep for ep in episodes}

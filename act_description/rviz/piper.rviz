@@ -216,8 +216,8 @@ Visualization Manager:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /cam_high/image_raw
+        Reliability Policy: System Default
+        Value: /cam_high/image_compressed/vis
       Value: true
     - Class: rviz_default_plugins/Image
       Enabled: true
@@ -230,8 +230,8 @@ Visualization Manager:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /cam_low/image_raw
+        Reliability Policy: System Default
+        Value: /cam_low/image_compressed/vis
       Value: true
     - Class: rviz_default_plugins/Image
       Enabled: true
@@ -244,8 +244,8 @@ Visualization Manager:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /cam_left_wrist/image_raw
+        Reliability Policy: System Default
+        Value: /cam_left_wrist/image_compressed/vis
       Value: true
     - Class: rviz_default_plugins/Image
       Enabled: true
@@ -258,8 +258,8 @@ Visualization Manager:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /cam_right_wrist/image_raw
+        Reliability Policy: System Default
+        Value: /cam_right_wrist/image_compressed/vis
       Value: true
   Enabled: true
   Global Options:

@@ -57,10 +57,10 @@ def generate_launch_description():
                     name='episode_replay_server',
                     parameters=[{
                         'image_topic_names': [
-                            '/camera1/image_compressed',
-                            '/camera2/image_compressed',
-                            '/camera3/image_compressed',
-                            '/camera4/image_compressed',
+                            '/cam_high/image_compressed',
+                            '/cam_left_wrist/image_compressed',
+                            '/cam_low/image_compressed',
+                            '/cam_right_wrist/image_compressed',
                         ]
                     }],
                     extra_arguments=[{'use_intra_process_comms': True}],

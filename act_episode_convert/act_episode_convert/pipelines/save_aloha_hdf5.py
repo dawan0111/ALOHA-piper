@@ -11,12 +11,12 @@ def save_to_hdf5_pipeline(hdf5_path: str, topic_remap: dict = None, max_timestep
             image = obs.create_group('images')
 
             for topic in data_dict:
-                if topic.startswith('/camera') and data_dict[topic]:
-                    msg_type_str = data_dict[topic][0][1]
-                    if msg_type_str not in [
-                        "sensor_msgs/msg/Image", "sensor_msgs/msg/CompressedImage"
-                    ]:
+                if data_dict[topic]:
+                    msg_type_str = data_dict[topic][0][1].__name__
+
+                    if msg_type_str not in ["Image", "CompressedImage"]:
                         continue
+                    
                     ds_name = topic_remap_.get(topic, topic.strip('/').replace('/', '_'))
                     timestamps, _, msgs = zip(*data_dict[topic])
                     h, w = msgs[0].height, msgs[0].width
@@ -59,6 +59,8 @@ def save_to_hdf5_pipeline(hdf5_path: str, topic_remap: dict = None, max_timestep
             obs.create_dataset('qvel', data=qvel, dtype='float64')
             obs.create_dataset('effort', data=effort, dtype='float64')
             obs.create_dataset('action', data=action, dtype='float64')
+
+            root.close()
 
         return data_dict
     return save
