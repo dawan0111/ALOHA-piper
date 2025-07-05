@@ -7,8 +7,10 @@ class RobotInterface(abc.ABC):
     Abstract base class for robot controllers supporting multiple action modes.
     """
 
-    def __init__(self):
+    def __init__(self, node):
         # Default to POSITION control
+        self.node = node
+        self.robot_action_size = 0
         self._action_type: ActionType = ActionType.POSITION
 
     def set_action_type(self, action_type: ActionType):
