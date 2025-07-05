@@ -40,25 +40,25 @@ from launch_ros.descriptions import ComposableNode
 CAMERAS = []
 CAMERAS.append(
     CameraConfig(
-        name='camera1',
+        name='cam_high',
         param_path=Path(USB_CAM_DIR, 'config', 'params_1.yaml')
     ),
 )
 CAMERAS.append(
     CameraConfig(
-        name='camera2',
+        name='cam_left_wrist',
         param_path=Path(USB_CAM_DIR, 'config', 'params_2.yaml')
     ),
 )
 CAMERAS.append(
     CameraConfig(
-        name='camera3',
+        name='cam_low',
         param_path=Path(USB_CAM_DIR, 'config', 'params_3.yaml')
     ),
 )
 CAMERAS.append(
     CameraConfig(
-        name='camera4',
+        name='cam_right_wrist',
         param_path=Path(USB_CAM_DIR, 'config', 'params_4.yaml')
     ),
 )

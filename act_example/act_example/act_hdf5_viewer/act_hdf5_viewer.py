@@ -47,7 +47,7 @@ def show_images_cv2(image_dict, timestep, target_height=256):
 
     rendered_imgs = []
     for i, img in enumerate(imgs):
-        img_bgr = cv2.resize(cv2.cvtColor(img, cv2.COLOR_RGB2BGR), target_size)
+        img_bgr = cv2.resize(img, target_size)
         key_name = keys[i]
 
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -74,7 +74,7 @@ def show_images_cv2(image_dict, timestep, target_height=256):
 
 
 
-def play_episode(images, joint_pos, joint_cmd=None, fps=30.0):
+def play_episode(images, joint_pos, joint_cmd=None, fps=50.0):
     keys = list(images.keys())
     n_frames = min([images[k].shape[0] for k in keys] + [joint_pos.shape[0]])
     if joint_cmd is not None:
