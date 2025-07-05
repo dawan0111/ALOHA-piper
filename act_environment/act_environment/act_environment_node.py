@@ -1,4 +1,5 @@
 import rclpy
+import numpy as np
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 from act_environment.envs.act_environment import DualArmPiperEnv
@@ -17,8 +18,16 @@ class EnvMainNode(Node):
     def _run_loop(self):
         while rclpy.ok() and self._running:
             try:
-                action = [0.0] * self.env.robot.action_size
-                self.timestep = self.env.step(action)
+                pos = [0.045145072,
+                -0.016885792,
+                0.041150396000000006,
+                0.021089796000000004,
+                0.421987804,
+                0.08128904,
+                0.03934]
+
+                action = pos + pos
+                self.timestep = self.env.step(np.array(action))
                 self.get_logger().info(f"[STEP] {self.timestep.step_type}, Reward: {self.timestep.reward}")
             except Exception as e:
                 self.get_logger().error(f"[STEP ERROR] {e}")

@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'act_environment_node = '
+            'act_environment.act_environment_node:main.'
         ],
     },
 )

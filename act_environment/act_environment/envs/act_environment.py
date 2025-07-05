@@ -1,8 +1,8 @@
-from act_environment.envs._environment import Environment
-from act_environment.envs.robots.dual_piper_robot import DualArmPiperRobot
+from act_environment.envs._environment import Envionrment
+from act_environment.envs.robots.dual_piper_robot import DualPiperRobot
 from act_environment.envs.observers.aloha_observer import AlohaObserver
 
-class DualArmPiperEnv(Environment):
+class DualArmPiperEnv(Envionrment):
     def __init__(self, node, dt=0.02):
         """
         DualArmPiperEnv
@@ -11,6 +11,6 @@ class DualArmPiperEnv(Environment):
             node: rclpy Node
             dt: timestep duration in seconds
         """
-        robot = DualArmPiperRobot(node=node)
+        robot = DualPiperRobot(node=node)
         observer = AlohaObserver(node=node)
         super().__init__(robot=robot, observer=observer, DT=dt)

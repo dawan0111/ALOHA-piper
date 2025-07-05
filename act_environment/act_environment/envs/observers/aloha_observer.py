@@ -76,11 +76,13 @@ class AlohaObserver(ObserverInterface):
             }
 
             if self._joint_state_left is None or self._joint_state_right is None:
-                raise RuntimeError("JointState not fully received yet.")
-
-            qpos = np.concatenate([self._joint_state_left.position, self._joint_state_right.position])
-            qvel = np.concatenate([self._joint_state_left.velocity, self._joint_state_right.velocity])
-            effort = np.concatenate([self._joint_state_left.effort, self._joint_state_right.effort])
+                qpos = np.zeros(14, dtype=np.float32)
+                qvel = np.zeros(14, dtype=np.float32)
+                effort = np.zeros(14, dtype=np.float32)
+            else:
+                qpos = np.concatenate([self._joint_state_left.position, self._joint_state_right.position])
+                qvel = np.concatenate([self._joint_state_left.velocity, self._joint_state_right.velocity])
+                effort = np.concatenate([self._joint_state_left.effort, self._joint_state_right.effort])
 
         return {
             "images": images_copy,

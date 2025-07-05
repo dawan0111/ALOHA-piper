@@ -19,10 +19,9 @@ class Envionrment:
 
     def reset(self):
         self.robot.reset()
-
         return dm_env.TimeStep(
             step_type=dm_env.StepType.FIRST,
-            reward=self.get_reward(),
+            reward=0.0,
             discount=None,
             observation=self.get_observation())
      
@@ -31,11 +30,12 @@ class Envionrment:
 
         time.sleep(self.DT)
 
+        obs = self.get_observation()
         return dm_env.TimeStep(
             step_type=dm_env.StepType.MID,
-            reward=self.get_reward(),
+            reward=self.get_reward(obs),
             discount=None,
-            observation=self.get_observation())
+            observation=obs)
 
     def get_observation(self) -> Dict[str, Any]:
         obs = self.observer.get_observation()

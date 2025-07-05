@@ -9,7 +9,7 @@ class DualPiperRobot(RobotInterface):
     def __init__(self, node: Node):
         super().__init__(node)
 
-        self.robot_action_size = 14  # 7 joints for left arm + 7 joints for right arm
+        self.action_size = 14  # 7 joints for left arm + 7 joints for right arm
 
         self.left_pub = node.create_publisher(JointState, '/left_arm/joint_ctrl', 1)
         self.right_pub = node.create_publisher(JointState, '/right_arm/joint_ctrl', 1)
@@ -63,4 +63,4 @@ class DualPiperRobot(RobotInterface):
         return msg
 
     def reset(self):
-        raise NotImplementedError("reset() must be implemented by the subclass or user.")
+        return None
