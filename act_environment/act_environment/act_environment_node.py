@@ -1,5 +1,6 @@
 import rclpy
 import numpy as np
+import cv2
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 from act_environment.envs.act_environment import DualArmPiperEnv
@@ -18,17 +19,24 @@ class EnvMainNode(Node):
     def _run_loop(self):
         while rclpy.ok() and self._running:
             try:
-                pos = [0.045145072,
-                -0.016885792,
-                0.041150396000000006,
-                0.021089796000000004,
-                0.421987804,
-                0.08128904,
-                0.03934]
+                pos = [1.0,0.0,0.0,0.0,0.0,0.0,0.0]
 
                 action = pos + pos
                 self.timestep = self.env.step(np.array(action))
                 self.get_logger().info(f"[STEP] {self.timestep.step_type}, Reward: {self.timestep.reward}")
+                images = self.timestep.observation['images']
+
+                if images is not None:
+                    # OpenCV images concat 2x2 and visualize
+                    if 'cam_high' in images and 'cam_left_wrist' in images and 'cam_low' in images and 'cam_right_wrist' in images:
+                        # Concatenate images
+                        top_row = np.hstack((images['cam_high'], images['cam_left_wrist']))
+                        bottom_row = np.hstack((images['cam_low'], images['cam_right_wrist']))
+                        combined_image = np.vstack((top_row, bottom_row))
+                        cv2.imshow("Dual Arm Piper Environment", combined_image)
+                        cv2.waitKey(1)  # Update the window
+
+
             except Exception as e:
                 self.get_logger().error(f"[STEP ERROR] {e}")
 

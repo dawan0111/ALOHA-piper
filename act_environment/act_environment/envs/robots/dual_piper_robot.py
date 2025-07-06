@@ -11,8 +11,8 @@ class DualPiperRobot(RobotInterface):
 
         self.action_size = 14  # 7 joints for left arm + 7 joints for right arm
 
-        self.left_pub = node.create_publisher(JointState, '/left_arm/joint_ctrl', 1)
-        self.right_pub = node.create_publisher(JointState, '/right_arm/joint_ctrl', 1)
+        self.left_pub = node.create_publisher(JointState, '/left_arm/joint_ctrl_single', 1)
+        self.right_pub = node.create_publisher(JointState, '/right_arm/joint_ctrl_single', 1)
 
         self.action_type = ActionType.POSITION
         self.gripper_min = 0.0

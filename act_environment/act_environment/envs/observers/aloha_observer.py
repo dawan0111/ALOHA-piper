@@ -20,10 +20,10 @@ class AlohaObserver(ObserverInterface):
 
         # Subscribe compressed images
         image_topics = [
-            '/camera1/image_raw/compressed',
-            '/camera2/image_raw/compressed',
-            '/camera3/image_raw/compressed',
-            '/camera4/image_raw/compressed',
+            "/cam_high/image_compressed",
+            "/cam_left_wrist/image_compressed",
+            "/cam_low/image_compressed",
+            "/cam_right_wrist/image_compressed",
         ]
         for topic in image_topics:
             node.create_subscription(
