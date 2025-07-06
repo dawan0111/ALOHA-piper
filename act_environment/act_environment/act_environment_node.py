@@ -27,9 +27,14 @@ class EnvMainNode(Node):
                 images = self.timestep.observation['images']
 
                 if images is not None:
-                    # OpenCV images concat 2x2 and visualize
+                    # OpenCV images darw keyname and concat 2x2 and visualize
                     if 'cam_high' in images and 'cam_left_wrist' in images and 'cam_low' in images and 'cam_right_wrist' in images:
                         # Concatenate images
+                        images['cam_high'] = cv2.putText(images['cam_high'], 'cam_high', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                        images['cam_left_wrist'] = cv2.putText(images['cam_left_wrist'], 'cam_left_wrist', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                        images['cam_low'] = cv2.putText(images['cam_low'], 'cam_low', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                        images['cam_right_wrist'] = cv2.putText(images['cam_right_wrist'], 'cam_right_wrist', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                        
                         top_row = np.hstack((images['cam_high'], images['cam_left_wrist']))
                         bottom_row = np.hstack((images['cam_low'], images['cam_right_wrist']))
                         combined_image = np.vstack((top_row, bottom_row))

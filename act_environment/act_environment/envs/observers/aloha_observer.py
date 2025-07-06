@@ -54,6 +54,7 @@ class AlohaObserver(ObserverInterface):
         try:
             np_arr = np.frombuffer(msg.data, np.uint8)
             image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             if image is not None:
                 with self._lock:
                     self._images[topic_name] = image

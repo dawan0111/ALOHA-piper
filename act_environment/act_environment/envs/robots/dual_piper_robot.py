@@ -37,6 +37,9 @@ class DualPiperRobot(RobotInterface):
         left_cmd[6] = self.denormalize_gripper(left_cmd[6])
         right_cmd[6] = self.denormalize_gripper(right_cmd[6])
 
+        print("left gripper:", left_cmd[6])
+        print("right gripper:", right_cmd[6])
+
         msg_left = self._create_joint_msg(left_cmd)
         msg_right = self._create_joint_msg(right_cmd)
 
@@ -63,4 +66,8 @@ class DualPiperRobot(RobotInterface):
         return msg
 
     def reset(self):
+        pos1 = [0.0, 1.0, -1.25, 0.00, 0.75, 0.00, 0.0]
+        pos2 = [0.0, 1.0, -1.25, 0.00, 0.75, 0.00, 0.0]
+
+        self.apply_action(np.array(pos1 + pos2, dtype=np.float32))  # Reset to zero position
         return None

@@ -25,10 +25,11 @@ class Envionrment:
             discount=None,
             observation=self.get_observation())
      
-    def step(self, action: np.array) -> dm_env.TimeStep:
-        self.robot.apply_action(action)
+    def step(self, action: np.array, apply_action=True) -> dm_env.TimeStep:
+        if apply_action:
+            self.robot.apply_action(action)
 
-        time.sleep(self.DT)
+        time.sleep(0.02)
 
         obs = self.get_observation()
         return dm_env.TimeStep(
